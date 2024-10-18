@@ -1,0 +1,4 @@
+echo "Starting batch process..."
+pwd
+ls -la
+echo "Process completed."
