@@ -1,0 +1,4 @@
+asana_personal_token_value = "your-real-asana-pat"
+asana_project_id           = "your-real-asana-project-id"
+schedule_expression        = "cron(0 0 1 * ? *)"
+snapshot_age_days          = 365
