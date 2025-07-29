@@ -12,9 +12,11 @@ A lightweight AWS Lambda solution to automatically start and stop RDS and Aurora
 
 ## Project Structure
 
-```
+```none
 .
 ├── src/
+│   ├── __init__.py                    # Python package marker
+│   ├── custom_holidays.json           # Custom holiday configuration
 │   ├── lambda_function.py             # Lambda function source code
 │   └── requirements.txt               # Python dependencies
 ├── terraform/
@@ -24,6 +26,9 @@ A lightweight AWS Lambda solution to automatically start and stop RDS and Aurora
 │   ├── terraform.auto.tfvars.template # Template for variables
 │   ├── terraform.tf                   # Terraform version and provider requirements
 │   └── variables.tf                   # Variable definitions
+├── tests/s
+│   ├── __init__.py                    # Python package marker
+│   └── test_lambda_function.py        # Holiday detection test
 ├── .gitignore                         # Git ignore rules
 ├── build_lambda.sh                    # Script to build Lambda deployment package
 └── README.md                          # Project documentation
@@ -34,7 +39,7 @@ A lightweight AWS Lambda solution to automatically start and stop RDS and Aurora
 ### Prerequisites
 
 * Terraform (Tested with version `1.12.2`)
-* Python (Tested with version `3.13`)
+* Python (Tested with version `3.13.5`)
 * AWS account (with permissions to create Lambda, IAM, EventBridge)
 
 ### Setup
@@ -43,13 +48,12 @@ A lightweight AWS Lambda solution to automatically start and stop RDS and Aurora
 
    ```bash
    git clone https://github.com/yowatanabe/devops-tools.git
-   cd terraform/rds-auto-scheduler
+   cd terraform/rds-auto-scheduler/terraform
    ```
 
 1. Create `terraform.auto.tfvars` from the provided template.
 
    ```bash
-   cd terraform
    cp terraform.auto.tfvars.template terraform.auto.tfvars
    ```
 
@@ -84,4 +88,39 @@ aws rds add-tags-to-resource \
 aws rds add-tags-to-resource \
   --resource-name arn:aws:rds:ap-northeast-1:123456789012:cluster:mycluster \
   --tags Key=AutoSchedule,Value=true
+```
+
+## Testing
+
+Test the holiday detection functionality before deployment:
+
+```bash
+# Test current year
+python -m tests.test_lambda_function
+
+# Test specific year
+python -m tests.test_lambda_function 2025
+```
+
+The test will show:
+
+* Official holidays (from Cabinet Office)
+* Custom holidays (from `src/custom_holidays.json`)
+* Weekends (normally handled by EventBridge cron schedule)
+* Working days (when Lambda will execute)
+
+### Custom Holidays
+
+Edit `src/custom_holidays.json` to add company-specific holidays:
+
+```json
+{
+  "custom_holidays": [
+    "2025-01-02",
+    "2025-01-03",
+    "2025-12-29",
+    "2025-12-30",
+    "2025-12-31"
+  ]
+}
 ```
