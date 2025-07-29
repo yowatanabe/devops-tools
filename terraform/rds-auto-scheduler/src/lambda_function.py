@@ -13,6 +13,27 @@ rds = boto3.client("rds")
 jst = pytz.timezone("Asia/Tokyo")
 
 
+def get_custom_holidays():
+    """
+    Get custom holidays from configuration file
+
+    Returns:
+        set: Set of custom holidays (YYYY-MM-DD format)
+    """
+    try:
+        # Get the directory of the current script
+        script_dir = os.path.dirname(os.path.abspath(__file__))
+        config_path = os.path.join(script_dir, "custom_holidays.json")
+
+        with open(config_path, "r", encoding="utf-8") as f:
+            config = json.load(f)
+
+        return set(config.get("custom_holidays", []))
+    except Exception as e:
+        print(f"Failed to load custom holidays: {e}")
+        return set()
+
+
 def get_japanese_holidays(year):
     """
     Get Japanese holidays for the specified year from the Cabinet Office
@@ -27,9 +48,8 @@ def get_japanese_holidays(year):
     url = "https://www8.cao.go.jp/chosei/shukujitsu/syukujitsu.csv"
     try:
         # Create HTTP request with User-Agent header
-        req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
         # Download CSV file with 10-second timeout
-        with urllib.request.urlopen(req, timeout=10) as response:
+        with urllib.request.urlopen(url, timeout=10) as response:
             # Decode data encoded in Shift_JIS
             content = response.read().decode("shift_jis")
 
@@ -172,10 +192,17 @@ def lambda_handler(event, context):
         today = now.strftime("%Y-%m-%d")
 
         # Check for holidays (skip processing if it's a holiday)
-        holidays = get_japanese_holidays(now.year)
-        if today in holidays:
-            print(f"Today is a holiday ({today}). Skipping action.")
-            return {"statusCode": 200, "body": "Holiday - no action taken"}
+        official_holidays = get_japanese_holidays(now.year)
+        custom_holidays = get_custom_holidays()
+        all_holidays = official_holidays.union(custom_holidays)
+
+        if today in all_holidays:
+            holiday_type = "official" if today in official_holidays else "custom"
+            print(f"Today is a {holiday_type} holiday ({today}). Skipping action.")
+            return {
+                "statusCode": 200,
+                "body": f"{holiday_type.title()} holiday - no action taken",
+            }
 
         # Process RDS/Aurora with AutoSchedule=true tag
         process_rds_instances(action)
