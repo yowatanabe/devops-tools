@@ -1,0 +1,7 @@
+# RDS Auto Scheduler Configuration Template
+# Copy this file to terraform.auto.tfvars and customize as needed
+
+# Schedule configuration (EventBridge cron expressions in UTC)
+# Default: Start at 9:00 JST (00:00 UTC), Stop at 18:00 JST (09:00 UTC)
+start_schedule = "cron(0 0 ? * MON-FRI *)"  # 9:00 JST weekdays
+stop_schedule  = "cron(0 9 ? * MON-FRI *)"  # 18:00 JST weekdays
