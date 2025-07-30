@@ -15,7 +15,7 @@ jst = pytz.timezone("Asia/Tokyo")
 
 def get_custom_holidays():
     """
-    Get custom holidays from configuration file
+    Get custom holidays from CSV file
 
     Returns:
         set: Set of custom holidays (YYYY-MM-DD format)
@@ -23,12 +23,16 @@ def get_custom_holidays():
     try:
         # Get the directory of the current script
         script_dir = os.path.dirname(os.path.abspath(__file__))
-        config_path = os.path.join(script_dir, "custom_holidays.json")
+        config_path = os.path.join(script_dir, "custom_holidays.csv")
 
+        holidays = set()
         with open(config_path, "r", encoding="utf-8") as f:
-            config = json.load(f)
+            reader = csv.reader(f)
+            for row in reader:
+                if len(row) >= 1 and row[0].strip():
+                    holidays.add(row[0].strip())
 
-        return set(config.get("custom_holidays", []))
+        return holidays
     except Exception as e:
         print(f"Failed to load custom holidays: {e}")
         return set()

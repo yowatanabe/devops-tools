@@ -17,7 +17,7 @@ pip install -r "$SRC_DIR/requirements.txt" -t "$BUILD_DIR"
 
 # Copy Lambda function and configuration
 cp "$SRC_DIR/lambda_function.py" "$BUILD_DIR/"
-cp "$SRC_DIR/custom_holidays.json" "$BUILD_DIR/"
+cp "$SRC_DIR/custom_holidays.csv" "$BUILD_DIR/"
 
 # Create zip file
 cd "$BUILD_DIR"

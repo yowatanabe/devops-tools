@@ -16,7 +16,7 @@ A lightweight AWS Lambda solution to automatically start and stop RDS and Aurora
 .
 ├── src/
 │   ├── __init__.py                    # Python package marker
-│   ├── custom_holidays.json           # Custom holiday configuration
+│   ├── custom_holidays.csv            # Custom holiday configuration
 │   ├── lambda_function.py             # Lambda function source code
 │   └── requirements.txt               # Python dependencies
 ├── terraform/
@@ -105,22 +105,18 @@ python -m tests.test_lambda_function 2025
 The test will show:
 
 * Official holidays (from Cabinet Office)
-* Custom holidays (from `src/custom_holidays.json`)
+* Custom holidays (from `src/custom_holidays.csv`)
 * Weekends (normally handled by EventBridge cron schedule)
 * Working days (when Lambda will execute)
 
 ### Custom Holidays
 
-Edit `src/custom_holidays.json` to add company-specific holidays:
+Edit `src/custom_holidays.csv` to add company-specific holidays:
 
-```json
-{
-  "custom_holidays": [
-    "2025-01-02",
-    "2025-01-03",
-    "2025-12-29",
-    "2025-12-30",
-    "2025-12-31"
-  ]
-}
+```csv
+2025-01-02
+2025-01-03
+2025-12-29
+2025-12-30
+2025-12-31
 ```
