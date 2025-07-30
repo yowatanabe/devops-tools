@@ -51,7 +51,6 @@ def get_japanese_holidays(year):
     # Official holiday CSV file from the Cabinet Office
     url = "https://www8.cao.go.jp/chosei/shukujitsu/syukujitsu.csv"
     try:
-        # Create HTTP request with User-Agent header
         # Download CSV file with 10-second timeout
         with urllib.request.urlopen(url, timeout=10) as response:
             # Decode data encoded in Shift_JIS
